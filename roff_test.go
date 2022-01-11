@@ -77,6 +77,6 @@ func TestList(t *testing.T) {
 	doc.List("Second")
 
 	if doc.String() != "\n.RS 4\n.IP \\(bu 3\nFirst\n.IP \\(bu 3\nSecond\n" {
-		t.Error("Expected indentation, got:", []byte(doc.String()))
+		t.Error("Expected list, got:", []byte(doc.String()))
 	}
 }
