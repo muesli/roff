@@ -1,5 +1,11 @@
 # roff
 
+[![Latest Release](https://img.shields.io/github/release/muesli/roff.svg)](https://github.com/muesli/roff/releases)
+[![Build Status](https://github.com/muesli/roff/workflows/build/badge.svg)](https://github.com/muesli/roff/actions)
+[![Coverage Status](https://coveralls.io/repos/github/muesli/roff/badge.svg?branch=main)](https://coveralls.io/github/muesli/roff?branch=main)
+[![Go ReportCard](https://goreportcard.com/badge/muesli/roff)](https://goreportcard.com/report/muesli/roff)
+[![GoDoc](https://godoc.org/github.com/golang/gddo?status.svg)](https://pkg.go.dev/github.com/muesli/roff)
+
 roff lets you write roff documents in Go
 
 ## Tutorial
