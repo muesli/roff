@@ -42,9 +42,9 @@ func NewDocument() *Document {
 }
 
 // write writes the given text to the internal buffer. Following the roff docs,
-// we prevent empty lines in its ouput, as that may mysteriously break some roff
-// renderers.
-func (tr *Document) write(format string, args ...interface{}) {
+// we prevent empty lines in its output, as that may mysteriously break some
+// roff renderers.
+func (tr *Document) writef(format string, args ...interface{}) {
 	if bytes.HasSuffix(tr.buffer.Bytes(), []byte("\n")) &&
 		strings.HasPrefix(format, "\n") {
 		// prevent empty lines in output
@@ -54,56 +54,56 @@ func (tr *Document) write(format string, args ...interface{}) {
 	fmt.Fprintf(&tr.buffer, format, args...)
 }
 
-func (tr *Document) writeln(format string, args ...interface{}) {
-	tr.write(format+"\n", args...)
+func (tr *Document) writelnf(format string, args ...interface{}) {
+	tr.writef(format+"\n", args...)
 }
 
 // Heading writes the title heading of the document.
 func (tr *Document) Heading(section uint, title, description string, ts time.Time) {
-	tr.write(TitleHeading, strings.ToUpper(title), section, title, ts.Format("2006-01-02"), description)
+	tr.writef(TitleHeading, strings.ToUpper(title), section, title, ts.Format("2006-01-02"), description)
 }
 
 // Paragraph starts a new paragraph.
 func (tr *Document) Paragraph() {
-	tr.writeln(Paragraph)
+	tr.writelnf(Paragraph)
 }
 
 // Indent increases the indentation level.
 func (tr *Document) Indent(n int) {
 	if n >= 0 {
-		tr.writeln(Indent+" %d", n)
+		tr.writelnf(Indent+" %d", n)
 	} else {
-		tr.writeln(Indent)
+		tr.writelnf(Indent)
 	}
 }
 
 // IndentEnd decreases the indentation level.
 func (tr *Document) IndentEnd() {
-	tr.writeln(IndentEnd)
+	tr.writelnf(IndentEnd)
 }
 
 // TaggedParagraph starts a new tagged paragraph.
 func (tr *Document) TaggedParagraph(indentation int) {
 	if indentation >= 0 {
-		tr.writeln(TaggedParagraph+" %d", indentation)
+		tr.writelnf(TaggedParagraph+" %d", indentation)
 	} else {
-		tr.writeln(TaggedParagraph)
+		tr.writelnf(TaggedParagraph)
 	}
 }
 
 // List writes a list item.
 func (tr *Document) List(text string) {
-	tr.writeln(IndentedParagraph+" \\(bu 3\n%s", escapeText(strings.TrimSpace(text)))
+	tr.writelnf(IndentedParagraph+" \\(bu 3\n%s", escapeText(strings.TrimSpace(text)))
 }
 
 // Section writes a section heading.
 func (tr *Document) Section(text string) {
-	tr.writeln(SectionHeading, strings.ToUpper(text))
+	tr.writelnf(SectionHeading, strings.ToUpper(text))
 }
 
 // EndSection ends the current section.
 func (tr *Document) EndSection() {
-	tr.writeln("")
+	tr.writelnf("")
 }
 
 // Text writes text.
@@ -132,23 +132,23 @@ func (tr *Document) Text(text string) {
 				inList = false
 			}
 
-			tr.write(escapeText(s))
+			tr.writef(escapeText(s))
 		}
 	}
 }
 
 // TextBold writes text in bold.
 func (tr *Document) TextBold(text string) {
-	tr.write(Bold)
+	tr.writef(Bold)
 	tr.Text(text)
-	tr.write(PreviousFont)
+	tr.writef(PreviousFont)
 }
 
 // TextItalic writes text in italic.
 func (tr *Document) TextItalic(text string) {
-	tr.write(Italic)
+	tr.writef(Italic)
 	tr.Text(text)
-	tr.write(PreviousFont)
+	tr.writef(PreviousFont)
 }
 
 // String returns the roff document as a string.
