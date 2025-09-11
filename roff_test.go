@@ -6,10 +6,13 @@ import (
 )
 
 func TestTitleHeading(t *testing.T) {
-	doc := NewDocument()
-	doc.Heading(1, "Title", "A short description", time.Now())
+	now := time.Now()
+	ts := now.Format("2006-01-02")
 
-	if doc.String() != `.TH TITLE 1 "2022-01-11" "Title" "A short description"` {
+	doc := NewDocument()
+	doc.Heading(1, "Title", "A short description", now)
+
+	if doc.String() != `.TH TITLE 1 "`+ts+`" "Title" "A short description"` {
 		t.Error("Expected title heading, got:", doc.String())
 	}
 }
