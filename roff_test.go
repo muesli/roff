@@ -93,6 +93,42 @@ func TestTextBold(t *testing.T) {
 	}
 }
 
+func TestTextEscaping(t *testing.T) {
+	// '.' and '\'' are roff control characters only at the beginning of a
+	// line, so they must be escaped there but left untouched elsewhere.
+	tests := []struct {
+		name string
+		in   string
+		want string
+	}{
+		{"leading dot", ".hidden", `\&.hidden`},
+		{"leading apostrophe", "'quoted", `\&'quoted`},
+		{"mid-line dots untouched", "e.g. this", "e.g. this"},
+		{"backslash", `a\b`, `a\eb`},
+		{"dot after paragraph break", "a\n.b", "a\n.PP\n\\&.b"},
+	}
+
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			doc := NewDocument()
+			doc.Text(tt.in)
+
+			if got := doc.String(); got != tt.want {
+				t.Errorf("Text(%q) = %q, want %q", tt.in, got, tt.want)
+			}
+		})
+	}
+}
+
+func TestListEscaping(t *testing.T) {
+	doc := NewDocument()
+	doc.List(".item")
+
+	if doc.String() != "\n.IP \\(bu 3\n\\&.item\n" {
+		t.Error("Expected escaped list item, got:", doc.String())
+	}
+}
+
 func TestTextItalic(t *testing.T) {
 	doc := NewDocument()
 	doc.TextItalic("Test")

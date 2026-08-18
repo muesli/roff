@@ -163,7 +163,10 @@ func (tr Document) String() string {
 
 func escapeText(s string) string {
 	s = strings.ReplaceAll(s, `\`, `\e`)
-	s = strings.ReplaceAll(s, ".", "\\&.")
+	// '.' and '\'' introduce macro invocations at the beginning of a line
+	if strings.HasPrefix(s, ".") || strings.HasPrefix(s, "'") {
+		s = `\&` + s
+	}
 	return s
 }
 
