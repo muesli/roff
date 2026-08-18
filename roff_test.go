@@ -35,6 +35,31 @@ func TestText(t *testing.T) {
 	}
 }
 
+func TestTextVerbatim(t *testing.T) {
+	// User text must be written verbatim and must never be interpreted as a
+	// fmt format string (no verb expansion, no %!x(MISSING) artifacts).
+	tests := []struct {
+		name string
+		in   string
+		want string
+	}{
+		{"percent literal", "100% complete", "100% complete"},
+		{"format verbs", "use %s and %d here", "use %s and %d here"},
+		{"percent verb alone", "%v", "%v"},
+	}
+
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			doc := NewDocument()
+			doc.Text(tt.in)
+
+			if got := doc.String(); got != tt.want {
+				t.Errorf("Text(%q) = %q, want %q", tt.in, got, tt.want)
+			}
+		})
+	}
+}
+
 func TestTextBold(t *testing.T) {
 	doc := NewDocument()
 	doc.TextBold("Test")
