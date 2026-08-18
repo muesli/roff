@@ -17,12 +17,36 @@ func TestTitleHeading(t *testing.T) {
 	}
 }
 
+func TestTitleHeadingEscaped(t *testing.T) {
+	// Backslashes and double quotes in macro arguments must be escaped so
+	// they are rendered literally instead of being interpreted by roff.
+	now := time.Now()
+	ts := now.Format("2006-01-02")
+
+	doc := NewDocument()
+	doc.Heading(1, `Ti"tle`, `A \"quoted" \path`, now)
+
+	want := `.TH TI\(dqTLE 1 "` + ts + `" "Ti\(dqtle" "A \e\(dqquoted\(dq \epath"`
+	if doc.String() != want {
+		t.Errorf("Expected escaped title heading, got: %q", doc.String())
+	}
+}
+
 func TestSectionHeading(t *testing.T) {
 	doc := NewDocument()
 	doc.Section("Test")
 
 	if doc.String() != "\n.SH TEST\n" {
 		t.Error("Expected section heading, got:", []byte(doc.String()))
+	}
+}
+
+func TestSectionHeadingEscaped(t *testing.T) {
+	doc := NewDocument()
+	doc.Section(`See "notes" \ here`)
+
+	if doc.String() != "\n.SH SEE \\(dqNOTES\\(dq \\e HERE\n" {
+		t.Error("Expected escaped section heading, got:", doc.String())
 	}
 }
 
