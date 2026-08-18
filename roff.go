@@ -65,7 +65,7 @@ func (tr *Document) writelnf(format string, args ...interface{}) {
 
 // Heading writes the title heading of the document.
 func (tr *Document) Heading(section uint, title, description string, ts time.Time) {
-	tr.writef(TitleHeading, strings.ToUpper(title), section, title, ts.Format("2006-01-02"), description)
+	tr.writef(TitleHeading, escapeMacro(strings.ToUpper(title)), section, escapeMacro(title), ts.Format("2006-01-02"), escapeMacro(description))
 }
 
 // Paragraph starts a new paragraph.
@@ -103,7 +103,7 @@ func (tr *Document) List(text string) {
 
 // Section writes a section heading.
 func (tr *Document) Section(text string) {
-	tr.writelnf(SectionHeading, strings.ToUpper(text))
+	tr.writelnf(SectionHeading, escapeMacro(strings.ToUpper(text)))
 }
 
 // EndSection ends the current section.
@@ -164,5 +164,14 @@ func (tr Document) String() string {
 func escapeText(s string) string {
 	s = strings.ReplaceAll(s, `\`, `\e`)
 	s = strings.ReplaceAll(s, ".", "\\&.")
+	return s
+}
+
+// escapeMacro escapes roff special characters in macro arguments so they are
+// rendered literally: backslashes would otherwise introduce escape sequences,
+// and double quotes would otherwise terminate quoted macro arguments.
+func escapeMacro(s string) string {
+	s = strings.ReplaceAll(s, `\`, `\e`)
+	s = strings.ReplaceAll(s, `"`, `\(dq`)
 	return s
 }
