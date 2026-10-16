@@ -168,3 +168,41 @@ func TestList(t *testing.T) {
 		t.Error("Expected list, got:", []byte(doc.String()))
 	}
 }
+
+func TestTextClosesAutomaticListIndent(t *testing.T) {
+	for _, tc := range []struct {
+		name      string
+		text      string
+		following string
+		outer     bool
+		want      string
+	}{
+		{"list at end", "* First", "", false,
+			"\n.RS\n.IP \\(bu 3\nFirst\n.RE\n"},
+		{"text after list", "* First\n* Second", "After", false,
+			"\n.RS\n.IP \\(bu 3\nFirst\n.IP \\(bu 3\nSecond\n.RE\nAfter"},
+		{"explicit outer indent", "* First", "After", true,
+			"\n.RS 4\n.RS\n.IP \\(bu 3\nFirst\n.RE\nAfter\n.RE\n"},
+		{"trailing newline", "* First\n", "After", false,
+			"\n.RS\n.IP \\(bu 3\nFirst\n.RE\nAfter"},
+		{"text in same call", "* First\nAfter", "", false,
+			"\n.RS\n.IP \\(bu 3\nFirst\n.RE\nAfter"},
+	} {
+		t.Run(tc.name, func(t *testing.T) {
+			doc := NewDocument()
+			if tc.outer {
+				doc.Indent(4)
+			}
+			doc.Text(tc.text)
+			if tc.following != "" {
+				doc.Text(tc.following)
+			}
+			if tc.outer {
+				doc.IndentEnd()
+			}
+			if got := doc.String(); got != tc.want {
+				t.Errorf("list document: want %q, got %q", tc.want, got)
+			}
+		})
+	}
+}

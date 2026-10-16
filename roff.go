@@ -140,6 +140,9 @@ func (tr *Document) Text(text string) {
 			tr.write(escapeText(s))
 		}
 	}
+	if inList {
+		tr.IndentEnd()
+	}
 }
 
 // TextBold writes text in bold.
